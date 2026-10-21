@@ -4,7 +4,7 @@ WORKDIR /src
 COPY package.json package-lock.json ./
 RUN npm install
 COPY src/ ./src/
-COPY tsconfig.json jest.config.js ./
+COPY tsconfig.json jest.config.js jest.setup.js ./
 # run tests
 RUN npm test
 
