@@ -13,14 +13,14 @@ export interface IUser {
   readonly name: string;
 }
 
-// TODO: read this from disk like before
-const uaccess = new Map<string, number>([
-  ['SkyeOfBreeze', 3],
-  ['kabbypls', 3],
-  ['DunkOrSlam', 3],
-  ['myndzi', 3],
-  ['SnekGregory', 3],
-]);
+// Privileged users, e.g. NT_UACCESS="rayyrawr:3,friend:2". Names are matched case-insensitively.
+const uaccess = new Map<string, number>(
+  (process.env.NT_UACCESS ?? '')
+    .split(',')
+    .map((entry) => entry.trim().split(':'))
+    .filter(([name, level]) => name && level)
+    .map(([name, level]): [string, number] => [name.toLowerCase(), parseInt(level, 10) || 0]),
+);
 
 let instanceId = 0;
 
@@ -48,7 +48,7 @@ export class UserState implements IUser {
     this.instanceId = instanceId++;
     this.id = id;
     this.name = name;
-    this.uaccess = uaccess.get(name) ?? 0;
+    this.uaccess = uaccess.get(name.toLowerCase()) ?? 0;
 
     this.socket = socket;
     this.currentRoom = null;
